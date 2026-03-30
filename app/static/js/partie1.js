@@ -28,7 +28,16 @@ btnRecord.onclick = async () => {
             btnSave.disabled = false;
         };
 
+        const dureeSec = parseFloat(document.getElementById('duree').value) || 5;
         mediaRecorder.start();
+        
+        // Arrêt automatique après la durée définie
+        setTimeout(() => {
+            if (mediaRecorder.state === "recording") {
+                btnStop.click();
+            }
+        }, dureeSec * 1000);
+
         btnRecord.disabled = true;
         btnRecord.classList.add('recording-pulse');
         btnStop.disabled = false;
