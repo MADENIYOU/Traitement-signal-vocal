@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
 from flask_cors import CORS
 from app.routes.partie1 import partie1_bp
 
@@ -18,6 +18,11 @@ def create_app():
     for folder in [app.config['UPLOAD_FOLDER'], app.config['SEGMENTS_FOLDER']]:
         if not os.path.exists(folder):
             os.makedirs(folder)
+
+    # Route pour servir les segments audio
+    @app.route('/segments/<path:filename>')
+    def serve_segments(filename):
+        return send_from_directory(app.config['SEGMENTS_FOLDER'], filename)
 
     # Enregistrement des Blueprints (routes)
     app.register_blueprint(partie1_bp, url_prefix='/partie1')

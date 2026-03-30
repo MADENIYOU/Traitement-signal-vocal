@@ -12,3 +12,4 @@ services:
     environment:
       - FLASK_ENV=development
       - PYTHONUNBUFFERED=1
+      - PYTHONPATH=.

@@ -109,17 +109,27 @@ function displaySegments(segments) {
     
     segments.forEach(seg => {
         const row = `
-            <tr>
+            <tr class="animate__animated animate__fadeInUp">
                 <td>${seg.id}</td>
-                <td>${seg.filename}</td>
-                <td>${seg.duration.toFixed(2)}</td>
+                <td>${seg.nom}</td>
+                <td>${seg.duree.toFixed(2)}s</td>
                 <td>
-                    <a href="${seg.path}" download class="btn btn-primary" style="padding: 0.3rem 0.6rem;">
-                        <i class="fas fa-download"></i>
-                    </a>
+                    <div class="action-buttons-cell">
+                        <button onclick="playSegment('${seg.path}')" class="btn btn-primary" style="padding: 0.3rem 0.6rem; background: var(--vert-nature);">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <a href="${seg.path}" download class="btn btn-primary" style="padding: 0.3rem 0.6rem;">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>
                 </td>
             </tr>
         `;
         body.innerHTML += row;
     });
+}
+
+function playSegment(path) {
+    const audio = new Audio(path);
+    audio.play();
 }

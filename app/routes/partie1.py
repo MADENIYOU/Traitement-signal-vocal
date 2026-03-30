@@ -38,16 +38,23 @@ def sauvegarder():
 def segmenter():
     """
     Endpoint pour lancer la segmentation automatique.
-    Attend : chemin du fichier, seuil, duree_silence.
     """
     data = request.json
     filepath = data.get('filepath')
-    seuil = float(data.get('seuil', -40))
-    duree_min = int(data.get('duree_min', 500))
+    top_db = float(data.get('seuil', 40))
+    min_silence_len_ms = int(data.get('duree_min', 300))
     
-    segments = segmenter_audio(filepath, seuil, duree_min)
-    
-    return jsonify({
-        "message": f"{len(segments)} segments détectés",
-        "segments": segments
-    })
+    try:
+        # Appel au service mis à jour
+        segments = segmenter_audio(
+            filepath, 
+            top_db=top_db, 
+            min_silence_len_ms=min_silence_len_ms
+        )
+        
+        return jsonify({
+            "message": f"{len(segments)} segments détectés",
+            "segments": segments
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
