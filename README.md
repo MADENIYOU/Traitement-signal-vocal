@@ -77,7 +77,7 @@ docker-compose down
 ```
 
 
-## 🚀 Installation & Lancement
+## 🚀 Installation Locale & Lancement Local
 
 ### Prérequis
 - Python 3.10+
