@@ -3,58 +3,96 @@ import os
 from app.services.enregistrement import sauvegarder_audio
 from app.services.segmentation import segmenter_audio
 
+# Initialisation du Blueprint pour le module de Numérisation & Segmentation
 partie1_bp = Blueprint('partie1', __name__)
 
 @partie1_bp.route('/')
 def interface():
-    """Affiche l'interface de numérisation et segmentation."""
+    """
+    Sert la page principale de la Partie 1.
+    
+    Returns:
+        Rendered HTML : Le template 'partie1.html' avec les contrôles d'enregistrement.
+    """
     return render_template('partie1.html')
 
 @partie1_bp.route('/sauvegarder', methods=['POST'])
 def sauvegarder():
     """
-    Endpoint pour recevoir l'audio du client et le sauvegarder.
-    Attend : blob audio, locuteur, session, parametres.
+    API : Reçoit, traite et enregistre le fichier audio sur le serveur.
+    
+    Attend une requête POST multipart/form-data contenant :
+    - audio: Le blob binaire (file)
+    - locuteur: L'ID du locuteur (string)
+    - session: L'ID de session (string, optionnel)
+    - frequence: Fréquence d'échantillonnage choisie (string)
+    - codage: Résolution binaire (16/32)
+    
+    Returns:
+        JSON: Le succès de l'opération et le chemin du fichier créé.
     """
     if 'audio' not in request.files:
-        return jsonify({"error": "Aucun fichier audio reçu"}), 400
+        return jsonify({"error": "Aucun fichier audio reçu dans la requête"}), 400
     
     audio_file = request.files['audio']
     locuteur = request.form.get('locuteur', 'inconnu')
+    # On peut étendre le système pour gérer plusieurs sessions dynamiques
     session = request.form.get('session', 'session_01')
+    
+    # Récupération des paramètres techniques pour le TNS
     params = {
-        'freq': request.form.get('frequence'),
-        'bits': request.form.get('codage')
+        'freq': request.form.get('frequence', '44100'),
+        'bits': request.form.get('codage', '16')
     }
     
-    chemin_complet = sauvegarder_audio(audio_file, locuteur, session, params)
-    
-    return jsonify({
-        "message": "Enregistrement sauvegardé",
-        "path": chemin_complet
-    })
+    try:
+        # Appel au service de bas niveau pour la gestion disque et conversion
+        chemin_complet = sauvegarder_audio(audio_file, locuteur, session, params)
+        
+        return jsonify({
+            "status": "success",
+            "message": "Signal vocal enregistré et converti au format PCM",
+            "path": chemin_complet
+        })
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @partie1_bp.route('/segmenter', methods=['POST'])
 def segmenter():
     """
-    Endpoint pour lancer la segmentation automatique.
+    API : Analyse un fichier existant pour le découper en segments.
+    
+    Attend un JSON contenant :
+    - filepath: Le chemin serveur du fichier source
+    - seuil: Le seuil dB (top_db) pour la détection
+    - duree_min: Durée minimale de silence entre segments (ms)
+    
+    Returns:
+        JSON: Liste des segments générés avec leurs métadonnées temporelles.
     """
     data = request.json
     filepath = data.get('filepath')
-    top_db = float(data.get('seuil', 40))
-    min_silence_len_ms = int(data.get('duree_min', 300))
+    
+    # Conversion et validation des paramètres algorithmiques
+    top_db = float(data.get('seuil', 20))
+    min_silence_len_ms = int(data.get('duree_min', 500))
+    
+    if not filepath:
+        return jsonify({"error": "Le chemin du fichier source est manquant"}), 400
     
     try:
-        # Appel au service mis à jour
-        segments = segmenter_audio(
+        # Déclenchement de l'algorithme de segmentation (librosa)
+        segments_detectes = segmenter_audio(
             filepath, 
             top_db=top_db, 
             min_silence_len_ms=min_silence_len_ms
         )
         
         return jsonify({
-            "message": f"{len(segments)} segments détectés",
-            "segments": segments
+            "status": "success",
+            "count": len(segments_detectes),
+            "message": f"Segmentation terminée : {len(segments_detectes)} éléments utiles isolés.",
+            "segments": segments_detectes
         })
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"status": "error", "message": f"Échec de l'analyse : {str(e)}"}), 500
