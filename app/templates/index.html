@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="hero">
+    <h1>Traitement Numérique du Signal Vocal</h1>
+    <p>Bienvenue sur l'application Kalàma dédiée au traitement du signal vocal : numérisation, segmentation et filtrage fréquentiel.</p>
+    <div class="hero-actions">
+        <a href="{{ url_for('partie1.interface') }}" class="btn btn-primary">Démarrer Partie 1</a>
+    </div>
+</section>
+
+<section class="info-grid">
+    <div class="card">
+        <h3><i class="fas fa-microphone"></i> Partie 1</h3>
+        <p>Numérisation et segmentation de la voix. Configurez vos paramètres d'échantillonnage et segmentez automatiquement vos enregistrements.</p>
+    </div>
+    <div class="card">
+        <h3><i class="fas fa-wave-square"></i> Partie 2</h3>
+        <p>Analyse fréquentielle et filtrage. Visualisez le spectre de votre voix et appliquez des filtres passe-bande ou coupe-bande.</p>
+    </div>
+</section>
+{% endblock %}
