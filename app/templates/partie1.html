@@ -1,101 +1,108 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section class="page-header">
-    <h2>Partie 1 : Numérisation et Segmentation de la Voix</h2>
-    <p>Configurez vos paramètres d'enregistrement avant de commencer.</p>
+<section class="page-header animate__animated animate__fadeIn">
+    <h2 style="color: var(--accent-cyan);">Numérisation & Segmentation de la Voix</h2>
+    <p style="color: var(--text-muted);">Paramétrez et capturez votre signal vocal pour une analyse temporelle détaillée.</p>
 </section>
 
 <div class="grid-layout">
     <!-- Panneau de contrôle -->
-    <div class="panel">
-        <h3><i class="fas fa-cog"></i> Paramètres de numérisation</h3>
+    <div class="panel animate__animated animate__fadeInLeft">
+        <h3><i class="fas fa-sliders-h"></i> Paramètres d'acquisition</h3>
         <form id="recordForm">
-            <div class="form-group">
-                <label for="frequence">Fréquence d'échantillonnage (Hz)</label>
-                <select id="frequence" name="frequence" class="form-control">
-                    <option value="16000">16 kHz</option>
-                    <option value="22050">22.05 kHz</option>
-                    <option value="44100" selected>44.1 kHz</option>
-                </select>
-            </div>
+            <div class="grid-layout" style="grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 0;">
+                <div class="form-group">
+                    <label for="frequence">Échantillonnage (Hz)</label>
+                    <select id="frequence" name="frequence" class="form-control">
+                        <option value="16000">16 kHz</option>
+                        <option value="22050">22.05 kHz</option>
+                        <option value="44100" selected>44.1 kHz</option>
+                    </select>
+                </div>
 
-            <div class="form-group">
-                <label>Codage (bits)</label>
-                <div class="radio-group">
-                    <label class="radio-label">
-                        <input type="radio" name="codage" value="16" checked> 16 bits
-                    </label>
-                    <label class="radio-label">
-                        <input type="radio" name="codage" value="32"> 32 bits
-                    </label>
+                <div class="form-group">
+                    <label>Résolution (bits)</label>
+                    <select name="codage" class="form-control">
+                        <option value="16">16 bits</option>
+                        <option value="32">32 bits</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="duree">Durée d'enregistrement (secondes)</label>
-                <input type="number" id="duree" name="duree" class="form-control" value="5" min="1">
+            <div class="grid-layout" style="grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 1rem;">
+                <div class="form-group">
+                    <label for="duree">Durée max</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="duree" name="duree" class="form-control" value="5" min="1">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="locuteur">ID Locuteur</label>
+                    <input type="text" id="locuteur" name="locuteur" class="form-control" value="01">
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="locuteur">Identifiant Locuteur (ex: 01)</label>
-                <input type="text" id="locuteur" name="locuteur" class="form-control" value="01">
-            </div>
-
-            <div class="action-buttons">
+            <div class="action-buttons" style="justify-content: center; background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 16px; border: 1px solid var(--glass-border);">
                 <button type="button" id="btnRecord" class="btn btn-record">
-                    <i class="fas fa-microphone"></i> Enregistrer
+                    <i class="fas fa-microphone"></i> <span>Enregistrer</span>
                 </button>
                 <button type="button" id="btnStop" class="btn btn-stop" disabled>
-                    <i class="fas fa-stop"></i> Arrêter
+                    <i class="fas fa-stop"></i>
                 </button>
                 <button type="button" id="btnSave" class="btn btn-save" disabled>
-                    <i class="fas fa-save"></i> Sauvegarder .wav
+                    <i class="fas fa-save"></i> <span>Sauvegarder</span>
                 </button>
             </div>
         </form>
         
         <div id="status" class="status-message">Prêt à l'enregistrement.</div>
-        <audio id="audioPlayback" controls class="audio-player" style="display:none;"></audio>
+        <div style="margin-top: 1rem; text-align: center;">
+            <audio id="audioPlayback" controls class="audio-player" style="display:none;"></audio>
+        </div>
     </div>
 
     <!-- Panneau de segmentation -->
-    <div class="panel">
-        <h3><i class="fas fa-cut"></i> Segmentation automatique</h3>
+    <div class="panel animate__animated animate__fadeInRight">
+        <h3><i class="fas fa-wave-square"></i> Détection d'activité vocale</h3>
         <div class="form-group">
             <label for="seuil">Seuil d'amplitude (top_db)</label>
-            <input type="number" id="seuil" name="seuil" class="form-control" value="20">
-            <small>Plus la valeur est basse, plus le détecteur est sensible.</small>
+            <input type="range" id="seuil" name="seuil" class="form-control" style="padding: 0;" min="10" max="60" value="20" oninput="this.nextElementSibling.innerText = this.value">
+            <span style="color: var(--accent-cyan); font-weight: 600;">20</span> <span style="font-size: 0.8rem; color: var(--text-muted);">dB</span>
         </div>
 
         <div class="form-group">
-            <label for="duree_min">Durée min. silence (ms)</label>
+            <label for="duree_min">Silence minimum (ms)</label>
             <input type="number" id="duree_min" name="duree_min" class="form-control" value="500">
         </div>
 
-        <button type="button" id="btnSegment" class="btn btn-primary" disabled>
-            <i class="fas fa-scissors"></i> Lancer le découpage
+        <button type="button" id="btnSegment" class="btn btn-primary" style="width: 100%; margin-top: 1rem;" disabled>
+            <i class="fas fa-cut"></i> Segmenter le signal
         </button>
 
-        <div id="segmentStatus" class="status-message">En attente d'un fichier sauvegardé...</div>
+        <div id="segmentStatus" class="status-message">Veuillez sauvegarder un fichier...</div>
     </div>
 </div>
 
 <!-- Liste des segments -->
-<section class="segments-section">
-    <h3>Liste des segments détectés</h3>
+<section id="resultsSection" class="segments-section animate__animated animate__fadeInUp" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 0;"><i class="fas fa-list"></i> Segments Détectés</h3>
+        <span id="segmentCount" style="background: var(--accent-blue); color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">0 segments</span>
+    </div>
     <div class="table-container">
         <table id="segmentsTable">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Nom du segment</th>
-                    <th>Durée (s)</th>
-                    <th>Actions</th>
+                    <th>Durée</th>
+                    <th style="text-align: right;">Action</th>
                 </tr>
             </thead>
             <tbody id="segmentsBody">
-                <!-- Rempli par JavaScript -->
+                <!-- Dynamique -->
             </tbody>
         </table>
     </div>

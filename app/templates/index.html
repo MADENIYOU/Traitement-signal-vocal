@@ -2,21 +2,44 @@
 
 {% block content %}
 <section class="hero">
-    <h1>Traitement Numérique du Signal Vocal</h1>
-    <p>Bienvenue sur l'application dédiée au traitement du signal vocal : numérisation, segmentation et filtrage fréquentiel.</p>
-    <div class="hero-actions">
-        <a href="{{ url_for('partie1.interface') }}" class="btn btn-primary">Démarrer Partie 1</a>
+    <div class="animate__animated animate__zoomIn">
+        <i class="fas fa-wave-square fa-4x floating" style="color: var(--accent-cyan); margin-bottom: 2rem;"></i>
+    </div>
+    <h1 class="animate__animated animate__fadeInDown">Analyse & Traitement du Signal Vocal</h1>
+    <p class="animate__animated animate__fadeInUp animate__delay-1s">
+        Une plateforme interactive conçue pour explorer la numérisation, la segmentation et l'analyse fréquentielle des signaux sonores avec une précision professionnelle.
+    </p>
+    <div class="hero-actions animate__animated animate__fadeInUp animate__delay-1s">
+        <a href="{{ url_for('partie1.interface') }}" class="btn btn-primary btn-lg" style="padding: 1.2rem 2.5rem; font-size: 1.1rem;">
+            Explorer la Numérisation <i class="fas fa-arrow-right"></i>
+        </a>
     </div>
 </section>
 
 <section class="info-grid">
-    <div class="card">
-        <h3><i class="fas fa-microphone"></i> Partie 1</h3>
-        <p>Numérisation et segmentation de la voix. Configurez vos paramètres d'échantillonnage et segmentez automatiquement vos enregistrements.</p>
+    <div class="panel reveal-chill delay-1">
+        <h3><i class="fas fa-microphone-alt"></i> Acquisition & Numérisation</h3>
+        <p>Capturez des signaux vocaux en temps réel. Configurez la fréquence d'échantillonnage et la résolution binaire pour comprendre l'impact des paramètres de numérisation sur la qualité du signal.</p>
+        <ul style="color: var(--text-muted); padding-left: 1.5rem; margin-top: 1rem;">
+            <li>Échantillonnage jusqu'à 44.1 kHz</li>
+            <li>Codage 16 ou 32 bits</li>
+            <li>Visualisation immédiate</li>
+        </ul>
     </div>
-    <div class="card">
-        <h3><i class="fas fa-wave-square"></i> Partie 2</h3>
-        <p>Analyse fréquentielle et filtrage. Visualisez le spectre de votre voix et appliquez des filtres passe-bande ou coupe-bande.</p>
+
+    <div class="panel reveal-chill delay-2">
+        <h3><i class="fas fa-project-diagram"></i> Segmentation Intelligente</h3>
+        <p>Utilisez des algorithmes de détection d'activité vocale (VAD) pour isoler automatiquement les segments de parole du silence ambiant.</p>
+        <ul style="color: var(--text-muted); padding-left: 1.5rem; margin-top: 1rem;">
+            <li>Détection par seuil d'amplitude</li>
+            <li>Paramétrage du silence minimum</li>
+            <li>Exportation individuelle des segments</li>
+        </ul>
     </div>
+</section>
+
+<section class="panel reveal-chill delay-3" style="margin-top: 3rem; text-align: center;">
+    <h3><i class="fas fa-info-circle"></i> À propos du projet</h3>
+    <p style="max-width: 800px; margin: 0 auto;">Ce projet s'inscrit dans le cadre du module de Traitement Numérique du Signal (TNS). Il permet de mettre en pratique les concepts théoriques de Shannon, de quantification et de traitement temporel/fréquentiel.</p>
 </section>
 {% endblock %}
