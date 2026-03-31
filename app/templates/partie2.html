@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="page-header animate__animated animate__fadeIn">
+    <h2 style="color: var(--accent-purple);">Analyse FFT & Filtrage</h2>
+    <p style="color: var(--text-muted);">
+        Analyse fréquentielle du signal et filtrage par masque rectangulaire.
+    </p>
+</section>
+
+<div class="grid-layout">
+
+    <!-- Upload -->
+    <div class="panel animate__animated animate__fadeInLeft">
+        <h3><i class="fas fa-upload"></i> Chargement audio</h3>
+
+        <input type="file" id="audioFile" class="form-control" accept="audio/*">
+
+        <button id="btnUpload" class="btn btn-primary" style="width:100%; margin-top:1rem;">
+            Charger & Analyser
+        </button>
+
+        <div id="uploadStatus" class="status-message">Aucun fichier chargé</div>
+    </div>
+
+    <!-- Filtrage -->
+    <div class="panel animate__animated animate__fadeInRight">
+        <h3><i class="fas fa-filter"></i> Filtrage fréquentiel</h3>
+
+        <div class="form-group">
+            <label>fmin (Hz)</label>
+            <input type="number" id="fmin" class="form-control" value="300">
+        </div>
+
+        <div class="form-group">
+            <label>fmax (Hz)</label>
+            <input type="number" id="fmax" class="form-control" value="3000">
+        </div>
+
+        <div class="form-group">
+            <label>Type de filtre</label>
+            <select id="typeFiltre" class="form-control">
+                <option value="passe_bande">Passe-bande</option>
+                <option value="coupe_bande">Coupe-bande</option>
+            </select>
+        </div>
+
+        <button id="btnFilter" class="btn btn-primary" style="width:100%;">
+            Appliquer le filtre
+        </button>
+
+        <div id="filterStatus" class="status-message">En attente...</div>
+    </div>
+</div>
+
+<!-- Graphiques -->
+<section class="segments-section animate__animated animate__fadeInUp">
+    <h3><i class="fas fa-chart-line"></i> Visualisation</h3>
+
+    <canvas id="signalChart"></canvas>
+    <canvas id="fftChart" style="margin-top:2rem;"></canvas>
+</section>
+
+<!-- Audio -->
+<section class="segments-section">
+    <h3><i class="fas fa-volume-up"></i> Résultat filtré</h3>
+
+    <audio id="audioResult" controls style="width:100%;"></audio>
+
+    <a id="downloadLink" class="btn btn-save" style="margin-top:1rem;">
+        Télécharger WAV
+    </a>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/partie2.js') }}"></script>
+{% endblock %}
