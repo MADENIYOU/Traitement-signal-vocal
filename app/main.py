@@ -35,6 +35,15 @@ def create_app():
     # Route pour servir les segments audio
     @app.route('/segments/<path:filename>')
     def serve_segments(filename):
+        """
+        Sert les fichiers audio des segments depuis le dossier dédié.
+
+        Args:
+            filename (str): Chemin relatif du fichier segment dans le dossier segments/.
+
+        Returns:
+            file: Le fichier audio demandé.
+        """
         return send_from_directory(app.config['SEGMENTS_FOLDER'], filename)
 
     # Enregistrement des Blueprints (routes)

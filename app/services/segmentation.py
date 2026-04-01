@@ -131,6 +131,12 @@ def _fusionner_intervalles(intervalles: np.ndarray, gap_min_samples: int) -> lis
 def _nettoyer_dossier(dossier: str):
     """
     Supprime tous les fichiers WAV d'un répertoire pour préparer une nouvelle segmentation.
+
+    Args:
+        dossier (str): Chemin absolu du répertoire à vider.
+
+    Returns:
+        None
     """
     if os.path.exists(dossier):
         for f in os.listdir(dossier):

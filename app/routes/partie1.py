@@ -40,9 +40,22 @@ def sauvegarder():
     session = request.form.get('session', 'session_01')
     
     # Récupération des paramètres techniques pour le TNS
+    freq = request.form.get('frequence')
+    bits = request.form.get('codage')
+
+    # Validation stricte selon les contraintes du sujet (Section 2.1)
+    FREQS_AUTORISEES = ['16000', '22050', '44100']
+    BITS_AUTORISES = ['16', '32']
+
+    if freq not in FREQS_AUTORISEES or bits not in BITS_AUTORISES:
+        return jsonify({
+            "status": "error", 
+            "message": f"Paramètres invalides. Valeurs autorisées : Fréquences {FREQS_AUTORISEES} Hz, Codage {BITS_AUTORISES} bits."
+        }), 400
+
     params = {
-        'freq': request.form.get('frequence', '44100'),
-        'bits': request.form.get('codage', '16')
+        'freq': freq,
+        'bits': bits
     }
     
     try:
