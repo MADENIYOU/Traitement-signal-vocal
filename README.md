@@ -10,7 +10,7 @@
 2. [Structure du Dépôt](#-structure-du-dépôt)
 3. [Installation & Lancement](#-installation--lancement)
 4. [Partie 1 : Numérisation & Segmentation (TERMINÉE)](#-partie-1--numérisation--segmentation-terminée)
-5. [Partie 2 : FFT & Filtrage (À FAIRE)](#-partie-2--fft--filtrage-à-faire)
+5. [Partie 2 : FFT & Filtrage (TERMINÉE)](#-partie-2--fft--filtrage-terminée)
 6. [Contraintes Techniques & Standards](#-contraintes-techniques--standards)
 
 ---
@@ -29,21 +29,22 @@ tns_projet_v2/
 │   ├── main.py                  # Point d'entrée Flask & Configuration
 │   ├── routes/
 │   │   ├── partie1.py           # API : Enregistrement et Segmentation
-│   │   └── partie2.py           # 🚧 À IMPLÉMENTER (FFT / Filtrage)
+│   │   └── partie2.py           # API : FFT / Filtrage
 │   ├── services/
 │   │   ├── enregistrement.py    # Logique de gestion des fichiers WAV & Dossiers
 │   │   ├── segmentation.py      # Algorithme de découpage (Librosa)
-│   │   └── fft_filtrage.py      # 🚧 À IMPLÉMENTER (FFT, Masque, IFFT)
+│   │   ├── fft_filtrage.py      # Logique de FFT, Masque, IFFT
+│   │   └── conversion_audio.py  # Service de conversion audio (MP3/OGG -> WAV)
 │   ├── templates/
 │   │   ├── base.html            # Layout commun (SignaVox Branding)
 │   │   ├── index.html           # Accueil animé
 │   │   ├── partie1.html         # UI Numérisation (Terminée)
-│   │   └── partie2.html         # 🚧 À IMPLÉMENTER (UI Filtrage)
+│   │   └── partie2.html         # UI Filtrage (Terminée)
 │   └── static/
 │       ├── css/style.css        # Design "Deep Tech" & Glassmorphism
 │       └── js/
 │           ├── partie1.js       # Chronomètre, VAD UI, Auto-scroll
-│           └── partie2.js       # 🚧 À IMPLÉMENTER (Graphiques Chart.js/Plotly)
+│           └── partie2.js       # Logique frontend FFT/Filtrage (Graphiques Chart.js)
 ├── database/                    # Stockage structuré des enregistrements (.wav)
 ├── segments/                    # Sorties de la segmentation automatique
 ├── requirements.txt             # Dépendances Python
@@ -120,25 +121,26 @@ Les fichiers sont sauvegardés selon une arborescence stricte imposée par le su
 ### ✂️ Segmentation Automatique
 - **Algorithme :** Utilisation de `librosa.effects.split` pour détecter les silences.
 - **Paramètres :** Seuil de top_db (dB) et durée minimale de silence (ms).
-- **Interface :** Tableau dynamique des segments avec pré-écoute et téléchargement individuel.
+- **Interface :** Tableau dynamique des segments avec **fonctionnalité Play/Stop intégrée** et téléchargement individuel.
 
 ### ✨ Améliorations UI/UX (SignaVox Edition)
 - **Chronomètre temps réel :** Affichage MM:SS directement sur le bouton d'enregistrement.
 - **Auto-scroll :** Défilement fluide vers les résultats après le traitement.
 - **Design :** Thème sombre, animations légères ("Chill Reveal") pour économiser le CPU.
+- **Boutons d'action des segments :** Design moderne et interactif avec effets de survol/clic.
 
 ---
 
-## 🚧 Partie 2 : FFT & Filtrage (À FAIRE)
+## ✅ Partie 2 : FFT & Filtrage (TERMINÉE)
 
-Le responsable de la Partie 2 doit implémenter les fonctionnalités suivantes :
+Cette partie permet l'analyse fréquentielle et l'application de filtres sur des signaux audio.
 
 ### 1. Analyse Fréquentielle
-- **Chargement :** Permettre l'upload de n'importe quel format (MP3, OGG) et convertir automatiquement en **WAV**.
+- **Chargement :** Permettre l'upload de n'importe quel format (MP3, OGG) avec un **input de fichier stylisé et convivial**. Conversion automatique en **WAV**.
 - **Visualisation :** Afficher le signal temporel $x(t)$ et son spectre d'amplitude $|X(f)|$ calculé par **FFT**.
 
 ### 2. Filtrage (Contrainte ABSOLUE)
-Le filtrage doit être réalisé exclusivement par un **masque fréquentiel rectangulaire** :
+Le filtrage est réalisé exclusivement par un **masque fréquentiel rectangulaire** :
 - **Passe-bande :** Conserver les fréquences dans $[f_{min}, f_{max}]$.
 - **Coupe-bande :** Supprimer les fréquences dans $[f_{min}, f_{max}]$.
 - *Note : L'utilisation de filtres récursifs (Butterworth, etc.) est proscrite pour ce projet.*
@@ -147,6 +149,10 @@ Le filtrage doit être réalisé exclusivement par un **masque fréquentiel rect
 - Reconstruire le signal via la **Transformée de Fourier Inverse (IFFT)**.
 - Afficher la comparaison spectrale **Avant / Après**.
 - Permettre l'écoute et le téléchargement du signal filtré.
+
+### ✨ Améliorations UI/UX (SignaVox Edition)
+- **Input de fichier stylisé :** Conception améliorée pour une meilleure expérience utilisateur lors du choix de fichiers audio.
+- **Graphiques interactifs :** Utilisation de Chart.js pour des visualisations claires et responsives du signal temporel et spectral.
 
 ---
 
