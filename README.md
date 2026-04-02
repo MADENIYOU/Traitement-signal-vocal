@@ -63,7 +63,7 @@ tns_projet_v2/
 
 ```bash
 # Cloner le repo
-git clone [<URL_DU_REPO>](https://github.com/MADENIYOU/Traitement-signal-vocal)
+git clone https://github.com/MADENIYOU/Traitement-signal-vocal
 cd tns_projet
 
 # Construire et lancer
