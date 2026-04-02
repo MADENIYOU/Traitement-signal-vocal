@@ -41,3 +41,8 @@ segments/*
 # OS
 .DS_Store
 Thumbs.db
+
+# Documentation privée (ne pas partager)
+IMPLEMENTATION_PARTIE2.md
+implementation_partie2.md
+*.private.md
