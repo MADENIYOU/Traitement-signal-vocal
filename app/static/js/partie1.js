@@ -10,6 +10,11 @@ let lastSavedFilePath = ""; // Chemin serveur du dernier fichier enregistré
 let timerInterval;      // ID de l'intervalle pour le chronomètre
 let startTime;          // Timestamp du début de l'enregistrement
 
+// Variables globales pour gérer la lecture des segments
+let currentPlayingAudio = null; // Stocke l'objet Audio en cours de lecture
+let currentPlayingButton = null; // Stocke le bouton Play/Stop du segment en cours
+
+
 // Récupération des éléments DOM
 const btnRecord = document.getElementById('btnRecord');
 const btnStop = document.getElementById('btnStop');
@@ -203,7 +208,7 @@ function displaySegments(segments) {
                 <td><span class="badge-mono">${seg.duree.toFixed(3)}s</span></td>
                 <td style="text-align: right;">
                     <div class="action-cell-buttons">
-                        <button onclick="playSegment('${seg.path}')" class="btn-icon" title="Écouter">
+                        <button onclick="playSegment('${seg.path}', this)" class="btn-icon play-pause-btn" title="Écouter / Arrêter">
                             <i class="fas fa-play"></i>
                         </button>
                         <a href="${seg.path}" download class="btn-icon" title="Télécharger">
@@ -218,10 +223,47 @@ function displaySegments(segments) {
 }
 
 /**
- * Lecture audio ponctuelle pour un segment
+ * Gère la lecture et l'arrêt des segments audio.
+ * Assure qu'un seul segment est lu à la fois.
  * @param {string} path - URL du fichier segment
+ * @param {HTMLButtonElement} buttonElement - Le bouton qui a déclenché l'action (pour changer l'icône)
  */
-function playSegment(path) {
-    const audio = new Audio(path);
-    audio.play();
+function playSegment(path, buttonElement) {
+    const icon = buttonElement.querySelector('i');
+
+    // Si un autre audio est en cours de lecture
+    if (currentPlayingAudio && currentPlayingAudio !== buttonElement._audioInstance) {
+        currentPlayingAudio.pause();
+        currentPlayingAudio.currentTime = 0;
+        if (currentPlayingButton) {
+            currentPlayingButton.querySelector('i').classList.replace('fa-stop', 'fa-play');
+        }
+    }
+
+    // Associer l'instance Audio au bouton pour un accès facile
+    if (!buttonElement._audioInstance) {
+        buttonElement._audioInstance = new Audio(path);
+        buttonElement._audioInstance.onended = () => {
+            icon.classList.replace('fa-stop', 'fa-play');
+            currentPlayingAudio = null;
+            currentPlayingButton = null;
+        };
+    }
+    
+    const audio = buttonElement._audioInstance;
+
+    if (audio.paused) {
+        // Démarrer la lecture
+        audio.play();
+        icon.classList.replace('fa-play', 'fa-stop');
+        currentPlayingAudio = audio;
+        currentPlayingButton = buttonElement;
+    } else {
+        // Mettre en pause
+        audio.pause();
+        audio.currentTime = 0; // Remettre à zéro pour la prochaine lecture
+        icon.classList.replace('fa-stop', 'fa-play');
+        currentPlayingAudio = null;
+        currentPlayingButton = null;
+    }
 }

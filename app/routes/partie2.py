@@ -137,22 +137,27 @@ def filtrer_signal():
 @partie2_bp.route('/telecharger', methods=['GET'])
 def telecharger_signal_filtre():
     """
-    Permet de télécharger un signal filtré de manière sécurisée.
+    Permet de télécharger ou d'écouter un signal (original ou filtré) de manière sécurisée.
 
     Paramètres GET:
-        fichier (str): Nom du fichier filtré à télécharger (uniquement le nom).
+        fichier (str): Nom du fichier à récupérer.
 
     Retour:
-        Fichier WAV en téléchargement.
+        Fichier WAV pour lecture ou téléchargement.
     """
     nom_fichier = request.args.get('fichier')
     
     if not nom_fichier:
         return jsonify({"erreur": "Nom fichier manquant"}), 400
     
-    # Reconstruction sécurisée du chemin
+    # 1. On cherche d'abord dans le dossier des filtres
     filtered_folder = current_app.config['FILTERED_FOLDER']
     chemin = os.path.join(filtered_folder, nom_fichier)
+    
+    # 2. Si non trouvé, on cherche dans le dossier des uploads (pour le signal original)
+    if not os.path.exists(chemin):
+        upload_folder = current_app.config['UPLOAD_PARTIE2']
+        chemin = os.path.join(upload_folder, nom_fichier)
     
     if not os.path.exists(chemin):
         return jsonify({"erreur": f"Fichier introuvable: {nom_fichier}"}), 404

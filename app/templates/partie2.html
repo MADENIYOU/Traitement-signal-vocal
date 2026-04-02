@@ -14,7 +14,13 @@
     <div class="panel animate__animated animate__fadeInLeft">
         <h3><i class="fas fa-upload"></i> Chargement audio</h3>
 
-        <input type="file" id="audioFile" class="form-control" accept="audio/*">
+        <div class="custom-file-input-wrapper">
+            <input type="file" id="audioFile" accept="audio/*" class="hidden-file-input">
+            <button type="button" class="btn btn-primary custom-file-button">
+                <i class="fas fa-folder-open"></i> Choisir un fichier audio
+            </button>
+            <span id="fileNameDisplay" class="file-name-display">Aucun fichier choisi</span>
+        </div>
 
         <button id="btnUpload" class="btn btn-primary" style="width:100%; margin-top:1rem;">
             Charger & Analyser
@@ -61,15 +67,27 @@
     <canvas id="fftChart" style="margin-top:2rem;"></canvas>
 </section>
 
-<!-- Audio -->
-<section class="segments-section">
-    <h3><i class="fas fa-volume-up"></i> Résultat filtré</h3>
+<!-- Audio & Restitution -->
+<section class="segments-section animate__animated animate__fadeInUp">
+    <h3><i class="fas fa-headphones"></i> Restitution & Comparaison</h3>
+    
+    <div class="grid-layout" style="grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <!-- Moitié Gauche : Original -->
+        <div class="panel" style="background: rgba(255,255,255,0.02); border-color: var(--accent-blue);">
+            <h4 style="color: var(--accent-blue); margin-bottom: 1rem;"><i class="fas fa-history"></i> Signal Original</h4>
+            <audio id="audioOriginal" controls style="width:100%;"></audio>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Source chargée depuis l'interface</p>
+        </div>
 
-    <audio id="audioResult" controls style="width:100%;"></audio>
-
-    <a id="downloadLink" class="btn btn-save" style="margin-top:1rem;">
-        Télécharger WAV
-    </a>
+        <!-- Moitié Droite : Filtré -->
+        <div class="panel" style="background: rgba(255,255,255,0.02); border-color: var(--accent-purple);">
+            <h4 style="color: var(--accent-purple); margin-bottom: 1rem;"><i class="fas fa-magic"></i> Signal Filtré</h4>
+            <audio id="audioResult" controls style="width:100%;"></audio>
+            <a id="downloadLink" class="btn btn-save" style="margin-top:1rem; width: 100%;">
+                <i class="fas fa-download"></i> Télécharger WAV Filtré
+            </a>
+        </div>
+    </div>
 </section>
 
 {% endblock %}

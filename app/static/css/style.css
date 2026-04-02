@@ -203,6 +203,64 @@ label {
     appearance: none; /* Reset pour style personnalisé */
 }
 
+/* Custom File Input Styling */
+.custom-file-input-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem; /* Ajouter un peu d'espace avant le bouton Upload */
+}
+
+.hidden-file-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 1; /* S'assurer qu'il est cliquable */
+}
+
+.custom-file-button {
+    flex-shrink: 0; /* Ne pas rétrécir */
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease-in-out;
+    background: var(--gradient-primary); /* Utiliser le gradient des boutons primaires */
+    color: white;
+    white-space: nowrap; /* Empêcher le texte de s'enrouler */
+}
+
+.custom-file-button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.file-name-display {
+    flex-grow: 1; /* Prend l'espace restant */
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.6);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Ajouter des points de suspension si le nom est trop long */
+}
+
+
 /* Style spécifique pour les SELECT */
 select.form-control {
     cursor: pointer;
@@ -271,7 +329,7 @@ select.form-control option {
     justify-content: center;
     gap: 12px;
     font-size: 0.9rem;
-    transition: all 0.3s;
+    transition: all 0.3s ease-in-out; /* Ajout d'une transition pour le confort visuel */
 }
 
 .btn-primary {
@@ -306,6 +364,41 @@ select.form-control option {
     opacity: 0.4;
     cursor: not-allowed;
     filter: grayscale(1);
+}
+
+/* Styles spécifiques pour les boutons d'action des segments */
+.btn-icon {
+    background: var(--glass); /* Fond semi-transparent */
+    border: 1px solid var(--glass-border); /* Bordure légère */
+    border-radius: 8px; /* Coins arrondis */
+    width: 40px; /* Taille fixe */
+    height: 40px; /* Taille fixe */
+    padding: 0; /* Supprime le padding par défaut du btn */
+    display: inline-flex; /* Permet l'alignement de l'icône */
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-cyan); /* Couleur de l'icône */
+    font-size: 1.1rem; /* Taille de l'icône */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Légère ombre */
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-icon:hover {
+    background: rgba(34, 211, 238, 0.1); /* Effet de survol plus prononcé */
+    border-color: var(--accent-cyan);
+    transform: translateY(-2px); /* Léger déplacement vers le haut */
+    box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+}
+
+.btn-icon:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.action-cell-buttons {
+    display: flex;
+    gap: 0.5rem; /* Espace entre les boutons d'action */
+    justify-content: flex-end; /* Aligner à droite dans la cellule */
 }
 
 /* Segments Table */

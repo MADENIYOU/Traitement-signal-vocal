@@ -67,12 +67,38 @@ document.addEventListener("DOMContentLoaded", function() {
     // Documentation MDN : https://developer.mozilla.org/fr/docs/Web/API/Document/getElementById
     const btnUpload = document.getElementById("btnUpload");
     const btnFilter = document.getElementById("btnFilter");
-    const fileInput = document.getElementById("audioFile");
+    const fileInput = document.getElementById("audioFile"); // This is now the hidden input
+
+    // Nouveaux éléments pour l'input de fichier stylisé
+    const customFileButton = document.querySelector(".custom-file-button");
+    const fileNameDisplay = document.getElementById("fileNameDisplay");
 
     // Vérification de l'existence des éléments (sécurité anti-crash)
     if (!btnUpload) console.error("[ERREUR] btnUpload introuvable!");
     if (!btnFilter) console.error("[ERREUR] btnFilter introuvable!");
-    if (!fileInput) console.error("[ERREUR] audioFile introuvable!");
+    if (!fileInput) console.error("[ERREUR] audioFile (input caché) introuvable!");
+    if (!customFileButton) console.error("[ERREUR] customFileButton introuvable!");
+    if (!fileNameDisplay) console.error("[ERREUR] fileNameDisplay introuvable!");
+
+    // ÉVÉNEMENT : Clic sur le bouton stylisé pour ouvrir la fenêtre de sélection de fichier
+    if (customFileButton) {
+        customFileButton.addEventListener("click", () => {
+            fileInput.click(); // Déclenche le clic sur l'input de fichier caché
+        });
+    }
+
+    // ÉVÉNEMENT : Sélection de fichier dans l'input caché
+    if (fileInput) {
+        fileInput.addEventListener("change", () => {
+            if (fileInput.files.length > 0) {
+                fileNameDisplay.innerText = fileInput.files[0].name; // Affiche le nom du fichier
+                fileNameDisplay.style.color = "var(--text-main)";
+            } else {
+                fileNameDisplay.innerText = "Aucun fichier choisi"; // Réinitialise si aucun fichier
+                fileNameDisplay.style.color = "var(--text-muted)";
+            }
+        });
+    }
 
     // =============================================================================
     // ÉVÉNEMENT : UPLOAD ET ANALYSE (Bouton "Charger & Analyser")
@@ -182,6 +208,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 // Mise à jour du statut avec les infos du fichier
                 status.innerText = `✅ Chargé (${data.duree}s, ${data.fe} Hz)`;
+
+                // Mise à jour du lecteur audio ORIGINAL
+                const audioOriginal = document.getElementById("audioOriginal");
+                if (audioOriginal) {
+                    audioOriginal.src = "/partie2/telecharger?fichier=" + data.fichier_wav;
+                }
 
                 /**
                  * Affichage des graphiques initiaux (signal simple, sans comparaison).
@@ -523,26 +555,19 @@ function afficherSignalCompare(dataAvant, dataApres) {
                     // Courbe 1 : Signal ORIGINAL
                     label: "Signal ORIGINAL (avant filtrage)",
                     data: dataAvant.signal,
-                    borderColor: "rgb(75, 192, 192)",  // Vert turquoise (couleur Chart.js par défaut)
-                    backgroundColor: "rgba(75, 192, 192, 0.1)",  // Fond semi-transparent
-                    borderWidth: 1.5,
-                    pointRadius: 0,  // Pas de points pour une ligne continue lisible
-                    tension: 0.1       // Légère courbure (0 = ligne droite, 1 = très courbée)
+                    borderColor: "rgba(75, 192, 192, 0.3)",  // Très transparent
+                    backgroundColor: "transparent",
+                    borderWidth: 1,
+                    pointRadius: 0,
+                    tension: 0.1
                 },
                 {
                     // Courbe 2 : Signal FILTRÉ
                     label: "Signal FILTRÉ (après filtrage)",
                     data: dataApres.signal,
-                    borderColor: "rgb(255, 99, 132)",  // Rouge (couleur Chart.js par défaut)
-                    backgroundColor: "rgba(255, 99, 132, 0.1)",
-                    borderWidth: 1.5,
-                    /**
-                     * borderDash : Crée une ligne en pointillés pour différencier visuellement
-                     * la courbe "après" filtrage de la courbe "avant".
-                     * Format : [longueur_trait, longueur_espace] en pixels
-                     * Documentation : https://www.chartjs.org/docs/latest/charts/line.html#cubic-interpolation-mode
-                     */
-                    borderDash: [5, 5],  // Trait de 5px, espace de 5px
+                    borderColor: "rgb(255, 99, 132)",  // Rouge vif opaque
+                    backgroundColor: "transparent",
+                    borderWidth: 2,
                     pointRadius: 0,
                     tension: 0.1
                 }
@@ -627,21 +652,20 @@ function afficherFFTCompare(dataAvant, dataApres) {
                     // Courbe 1 : Spectre ORIGINAL
                     label: "Spectre ORIGINAL |X(f)| (avant filtrage)",
                     data: dataAvant.amplitudes,
-                    borderColor: "rgb(54, 162, 235)",  // Bleu Chart.js
-                    backgroundColor: "rgba(54, 162, 235, 0.1)",
-                    borderWidth: 1.5,
+                    borderColor: "rgba(54, 162, 235, 0.3)",  // Bleu clair transparent
+                    backgroundColor: "transparent",
+                    borderWidth: 1,
                     pointRadius: 0,
                     tension: 0.1,
-                    fill: false  // Pas de remplissage sous la courbe
+                    fill: false
                 },
                 {
                     // Courbe 2 : Spectre FILTRÉ
                     label: "Spectre FILTRÉ |X'(f)| (après filtrage)",
                     data: dataApres.amplitudes,
-                    borderColor: "rgb(255, 159, 64)",  // Orange Chart.js
-                    backgroundColor: "rgba(255, 159, 64, 0.1)",
+                    borderColor: "rgb(255, 159, 64)",  // Orange vif opaque
+                    backgroundColor: "transparent",
                     borderWidth: 2,
-                    borderDash: [5, 5],  // Pointillés pour différencier
                     pointRadius: 0,
                     tension: 0.1,
                     fill: false
