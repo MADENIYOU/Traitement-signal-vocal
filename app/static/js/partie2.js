@@ -46,8 +46,17 @@ let signalChartInstance = null;
  */
 let fftChartInstance = null;
 
+/**
+ * Dernières données FFT affichées (pour mise à jour dynamique du zoom).
+ * Permet de re-afficher avec une fréquence max différente sans recharger les données.
+ * @type {Object|null}
+ * @property {number[]} freqs - Tableau des fréquences
+ * @property {number[]} amplitudes - Tableau des amplitudes
+ */
+let lastFFTData = null;
+
 // Log de version pour debug
-console.log("=== partie2.js CHARGÉ (v3 - comparaison avant/après) ===");
+console.log("=== partie2.js CHARGÉ (v4 - zoom FFT dynamique) ===");
 
 // =============================================================================
 // INITIALISATION - ATTENTE DU CHARGEMENT DU DOM
@@ -73,6 +82,50 @@ document.addEventListener("DOMContentLoaded", function() {
     if (!btnUpload) console.error("[ERREUR] btnUpload introuvable!");
     if (!btnFilter) console.error("[ERREUR] btnFilter introuvable!");
     if (!fileInput) console.error("[ERREUR] audioFile introuvable!");
+
+    // Récupération des éléments pour le zoom FFT
+    const btnActualiserFFT = document.getElementById("btnActualiserFFT");
+    const fftMaxInput = document.getElementById("fftMax");
+    
+    if (!btnActualiserFFT) console.error("[ERREUR] btnActualiserFFT introuvable!");
+    if (!fftMaxInput) console.error("[ERREUR] fftMax introuvable!");
+
+    // =============================================================================
+    // ÉVÉNEMENT : ZOOM FFT - Actualisation du graphique
+    // =============================================================================
+    
+    if (btnActualiserFFT && fftMaxInput) {
+        // Clic sur le bouton Actualiser
+        btnActualiserFFT.addEventListener("click", () => {
+            console.log("[DEBUG] Bouton Actualiser FFT cliqué");
+            if (lastFFTData) {
+                afficherFFT(lastFFTData);
+            } else {
+                console.warn("[DEBUG] Aucune donnée FFT à afficher");
+            }
+        });
+        
+        // Mise à jour dynamique quand on change la valeur (Enter ou perte de focus)
+        fftMaxInput.addEventListener("change", () => {
+            console.log("[DEBUG] Valeur fftMax changée:", fftMaxInput.value);
+            if (lastFFTData) {
+                afficherFFT(lastFFTData);
+            }
+        });
+        
+        // Mise à jour en temps réel pendant la frappe (optionnel, plus réactif)
+        fftMaxInput.addEventListener("input", () => {
+            if (lastFFTData && fftMaxInput.value >= 100) {
+                // Debounce simple : on attend que l'utilisateur arrête de taper
+                clearTimeout(window.fftTimeout);
+                window.fftTimeout = setTimeout(() => {
+                    afficherFFT(lastFFTData);
+                }, 300); // 300ms après la dernière frappe
+            }
+        });
+        
+        console.log("[DEBUG] Événements attachés à btnActualiserFFT et fftMax");
+    }
 
     // =============================================================================
     // ÉVÉNEMENT : UPLOAD ET ANALYSE (Bouton "Charger & Analyser")
@@ -437,17 +490,76 @@ function afficherSignal(data) {
  * Implémentation côté Python : scipy.fft.fft
  * Documentation scipy : https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.fft.html
  * 
+ * NOUVEAUTÉ : Cette fonction prend maintenant en compte la fréquence maximale
+ * définie par l'utilisateur via l'input #fftMax pour zoomer sur une zone 
+ * spécifique du spectre (ex: 0-2000 Hz pour la voix).
+ * 
  * @param {Object} data - Données spectrales {freqs: [...], amplitudes: [...]}
  * @param {number[]} data.freqs - Tableau des fréquences en Hz
  * @param {number[]} data.amplitudes - Tableau des amplitudes |X(f)|
  */
 function afficherFFT(data) {
+    // Sauvegarde des données pour mise à jour dynamique du zoom
+    // Permet de re-afficher avec une fréquence max différente sans recharger les données
+    lastFFTData = data;
+    
     const ctx = document.getElementById("fftChart");
+    
+    // Récupération de la fréquence max à afficher (input utilisateur)
+    // Valeur par défaut : 4000 Hz si l'input n'existe pas ou est invalide
+    const fftMaxInput = document.getElementById("fftMax");
+    const maxFreq = fftMaxInput ? (parseFloat(fftMaxInput.value) || 4000) : 4000;
+    
+    console.log("[DEBUG] afficherFFT - maxFreq:", maxFreq, "Hz");
+
+    // 🔥 FILTRAGE DES DONNÉES selon la fréquence max
+    // On ne garde que les points où freqs[i] <= maxFreq
+    // Cela permet de "zoomer" sur une zone spécifique du spectre
+    const freqs = [];
+    const amps = [];
+    for (let i = 0; i < data.freqs.length; i++) {
+        if (data.freqs[i] <= maxFreq) {
+            freqs.push(data.freqs[i]);
+            amps.push(data.amplitudes[i]);
+        }
+    }
+    
+    console.log("[DEBUG] afficherFFT - Points affichés:", freqs.length, "/", data.freqs.length);
 
     // Destruction de l'ancienne instance
     if (fftChartInstance) {
         fftChartInstance.destroy();
     }
+
+    fftChartInstance = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: freqs,
+            datasets: [{
+                label: `Spectre FFT (0 - ${maxFreq} Hz)`,
+                data: amps,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: "Fréquence (Hz)" // Unité : Hertz
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: "Amplitude"
+                    }
+                }
+            }
+        }
+    });
+}
 
     fftChartInstance = new Chart(ctx, {
         type: "line",

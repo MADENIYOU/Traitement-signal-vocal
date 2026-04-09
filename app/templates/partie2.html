@@ -53,13 +53,34 @@
     </div>
 </div>
 
-<!-- Graphiques -->
-<section class="segments-section animate__animated animate__fadeInUp">
-    <h3><i class="fas fa-chart-line"></i> Visualisation</h3>
+    <!-- Graphiques -->
+    <section class="segments-section animate__animated animate__fadeInUp">
+        <h3><i class="fas fa-chart-line"></i> Visualisation</h3>
 
-    <canvas id="signalChart"></canvas>
-    <canvas id="fftChart" style="margin-top:2rem;"></canvas>
-</section>
+        <!-- Signal temporel -->
+        <div style="margin-bottom: 2rem;">
+            <h4 style="color: var(--text-muted); margin-bottom: 1rem;">Signal temporel</h4>
+            <canvas id="signalChart"></canvas>
+        </div>
+
+        <!-- FFT avec contrôle de zoom -->
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                <h4 style="color: var(--text-muted); margin: 0;">Spectre FFT</h4>
+                
+                <!-- Contrôle de la fréquence max -->
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <label for="fftMax" style="color: var(--text-muted); font-size: 0.9rem;">Fréq. max affichée:</label>
+                    <input type="number" id="fftMax" class="form-control" value="4000" min="100" step="100" style="width: 100px;">
+                    <span style="color: var(--text-muted);">Hz</span>
+                    <button id="btnActualiserFFT" class="btn btn-primary" style="margin-left: 0.5rem;">
+                        <i class="fas fa-sync-alt"></i> Actualiser
+                    </button>
+                </div>
+            </div>
+            <canvas id="fftChart"></canvas>
+        </div>
+    </section>
 
 <!-- Audio -->
 <section class="segments-section">
